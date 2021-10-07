@@ -24,7 +24,7 @@ async function BPEP_APP({
 
         //region TEST
         //result = await agent.enforce({id: undefined, param: undefined}); // REM : no identifier
-        result = await agent.enforce({id: process_model.swim_lane.marzipan.start.id, param: undefined}); // REM : unknown identifier
+        result = await agent.enforce({id: `${id}process_model/pool/ec_ids_tc/INF_01/start/`, param: undefined}); // REM : unknown identifier
         console.warn(result);
         debugger;
         //endregion TEST
@@ -42,7 +42,7 @@ async function BPEP_APP({
             timestamp: jex.timestamp
         });
         debugger;
-        //throw(jex); // unhandled ESCEPTION
+        //throw(jex); // unhandled EXCEPTION
     } // if ()
 
 } // BPEP_APP()

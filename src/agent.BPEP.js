@@ -115,12 +115,12 @@ class BPEPAgent extends EventEmitter {
         super(); // EventEmitter
 
         if (!id)
-            throw(new ErrorIdIsMissing({id: `${uuid.v1()}`}));
+            throw(new InstanceErrorIdIsMissing({id: `${uuid.v1()}`}));
         this.#id = id;
 
         Object.defineProperties(this, {
-            id:      {value: this.#id, enumerable: true},
-            addNode: {
+            id:            {value: this.#id, enumerable: true},
+            addNode:       {
                 value:         (node) => {
                     try {
 
@@ -139,22 +139,61 @@ class BPEPAgent extends EventEmitter {
                     } // try
                 }, enumerable: false
             }, // addNode
-            hasNode: {
+            hasNode:       {
                 value:         (node) => {
                     try {
 
                         let id = ((typeof node === "string") ? node : node.id);
-                        _enforceable.get(id);
+                        return ((_enforceable.get(id)) ? true : false);
                     } catch (jex) {
                         throw(jex);
                     } // try
                 }, enumerable: false
             }, // hasNode
-            enforce: {
+            getNode:       {
+                value:         (id) => {
+                    try {
+                        return _enforceable.get(id);
+                    } catch (jex) {
+                        throw(jex);
+                    } // try
+                }, enumerable: false
+            }, // getNode
+            renderTargets: {
+                value:         async ({param: param = undefined}) => {
+                    try {
+                        let result = [];
+                        _enforceable.forEach((value, key, map) => {
+                            console.log(`m[${key}] = ${value}`);
+                            if (value.exit) {
+                                for (const [exit_key, exit_value] of Object.entries(value.exit)) {
+                                    if (typeof exit_value !== "function") {
+
+                                        let target = map.get(exit_key);
+
+                                        if (!target)
+                                            throw(new Error(``)); // TODO : better Error
+                                        if (typeof target !== "function")
+                                            throw(new Error(``)); // TODO : better Error
+
+                                        value.exit[exit_key] = target;
+
+                                    } // if ()
+                                } // for()
+                            } // if ()
+                            Object.freeze(value.exit);
+                        });
+                        return result;
+                    } catch (jex) {
+                        throw(jex); // TODO : better ERROR
+                    } // try
+                }, enumerable: false
+            }, // renderTargets
+            enforce:       {
                 value:                                       (({enforceable: enforceable}) => {
                     return async ({
                                       id:    id = undefined,
-                                      param: param
+                                      token: token
                                   }) => {
                         //this.#event({
                         //    id:        `${this.#id}event/#${uuid.v1()}`,
@@ -193,7 +232,7 @@ class BPEPAgent extends EventEmitter {
                                     prov:   `${this.#id}enforce/`
                                 });
 
-                            result = await target({param: param, data: undefined});
+                            result = await target({token: token});
 
                             if (error) {
                                 throw(error);
@@ -228,38 +267,17 @@ class BPEPAgent extends EventEmitter {
                         } // try
                     }; // return
                 })({enforceable: _enforceable}), enumerable: false
-            }, // enforce
+            } // enforce
+            ////
+            //addTargets:    {
+            //    value:         async (targets) => {
+            //        try {
             //
-            renderTargets: {
-                value:         async ({param: param = undefined}) => {
-                    try {
-                        let result = [];
-                        _enforceable.forEach((value, key, map) => {
-                            console.log(`m[${key}] = ${value}`);
-                            if (value.exit) {
-                                for (const [exit_key, exit_value] of Object.entries(value.exit)) {
-                                    if (typeof exit_value !== "function") {
+            //        } catch (jex) {
+            //        } // try
+            //    }, enumerable: false
+            //}, // addTargets
 
-                                        let target = map.get(exit_key);
-
-                                        if (!target)
-                                            throw(new Error(``)); // TODO : better Error
-                                        if (typeof target !== "function")
-                                            throw(new Error(``)); // TODO : better Error
-
-                                        value.exit[exit_key] = target;
-
-                                    } // if ()
-                                } // for()
-                            } // if ()
-                            Object.freeze(value.exit);
-                        });
-                        return result;
-                    } catch (jex) {
-                        throw(jex); // TODO : better ERROR
-                    } // try
-                }, enumerable: false
-            }
         }); // Object.defineProperties(BPEPAgent)
 
         //if (new.target === BPEPAgent)

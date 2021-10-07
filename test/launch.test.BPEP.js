@@ -14,6 +14,10 @@ let
 ;
 (async () => {
 
+    function endExit(token) {
+        debugger;
+    }
+
     const
         bpep_agent = new BPEPAgent({
             id: "https://www.nicos-rd.com/test/BPEFAgent/"
@@ -26,87 +30,99 @@ let
         bpep:      Object.freeze({
             id:      bpep_agent.id,
             addNode: bpep_agent.addNode,
-            hasNode: bpep_agent.hasNode
+            hasNode: bpep_agent.hasNode,
+            getNode: bpep_agent.getNode
         }),
         doAddNode: true
     });
 
     //BPMN.doAddNode    = true;
     let
-        process_model = {
-            ec:        {
-                type: "bpmn:SwimLane",
-                gax:  {
-                    type: "bpmn:SwimLane"
-
-                },
-                ids:  {
-                    type:   "bpmn:SwimLane",
-                    INF_01: {
-                        type: "bpmn:SubProcess"
-                    }
-                },
-                ip:   {
-                    type: "bpmn:SwimLane",
-                    ping: {
-                        type: "bpmn:SubProcess"
-                    }
-                },
-                net:  {
-                    type:  "bpmn:SwimLane",
-                    sniff: {
-                        type: "bpmn:SubProcess"
-                    }
-                }
+        BPEF_graph = /** @graph */ [
+            {
+                id:       `${app_uri}process_model/pool/ec_ids_tc/`,
+                type:     "bpmn:Pool",
+                label:    "IDS testcase",
+                swimLane: [`${app_uri}process_model/pool/ec_ids_tc/INF_01/`]
             },
-            swim_lane: {
-                id:       `${app_uri}process_model/swim_lane/`,
+            {
+                id:       `${app_uri}process_model/pool/ec_ids_tc/INF_01/`,
                 type:     "bpmn:SwimLane",
-                marzipan: {
-                    id:         `${app_uri}process_model/swim_lane/marzipan/`,
-                    type:       "bpmn:SwimLane",
-                    start:      {
-                        id:   `${app_uri}process_model/swim_lane/marzipan#start`,
-                        type: "bpmn:Start"
-                    },
-                    mammahinne: {
-                        id:   `${app_uri}process_model/swim_lane/marzipan/mammahinne/`,
-                        type: "bpmn:Activity"
-                    },
-                    end:        {
-                        id:   `${app_uri}process_model/swim_lane/marzipan#end`,
-                        type: "bpmn:End"
+                label:    "Testcase 'INF_01'",
+                start:    {
+                    id:   `${app_uri}process_model/pool/ec_ids_tc/INF_01/start/`,
+                    exit: `${app_uri}process_model/pool/ec_ids_tc/INF_01/getSelfDescription/`
+                },
+                activity: [
+                    {
+                        id:    `${app_uri}process_model/pool/ec_ids_tc/INF_01/getSelfDescription/`,
+                        type:  "bpmn:Activity",
+                        label: "getSelfDescription",
+                        exec:  async ({param: param}) => {
+                            console.warn(param);
+                            //debugger;
+                            let result = {mahl: "zeit"};
+                            return result;
+                        },
+                        exit:  `${app_uri}process_model/pool/ec_ids_tc/INF_01/end/`
+                    }
+                ],
+                end:      {
+                    id:   `${app_uri}process_model/pool/ec_ids_tc/INF_01/end/`,
+                    exit: /** callback */(token) => { // REM : functions will NOT be replaced by 'renderTargets''...
+                        console.warn(token);
+                        //debugger;
                     }
                 }
+                //start:              {
+                //    id:   `${app_uri}process_model/pool/ec_ids_tc/INF_01#start`,
+                //    type: "bpmn:Start"
+                //},
+                //getSelfDescription: {
+                //    id:   `${app_uri}process_model/pool/ec_ids_tc/INF_01#getSelfDescription`,
+                //    type: "bpmn:Activity"
+                //},
+                //end:                {
+                //    id:   `${app_uri}process_model/pool/ec_ids_tc/INF_01#end`,
+                //    type: "bpmn:End"
+                //}
             }
-        },
-        start         = undefined,
-        activity      = undefined,
-        end           = undefined
+        ],
+
+        start              = undefined,
+        activity           = undefined,
+        end                = undefined
     ;
+
+    let BPMN_buildExecutableFromGraph_result = await BPMN.buildExecutableFromGraph(BPEF_graph);
+    console.warn(BPMN_buildExecutableFromGraph_result);
+    debugger;
+
+    //process_model_two.set()
     try {
-        start    = BPMN.Start({
-            id:   process_model.swim_lane.marzipan.start.id,
-            exit: process_model.swim_lane.marzipan.mammahinne.id
-        });
-        activity = BPMN.Activity({
-            id:   process_model.swim_lane.marzipan.mammahinne.id,
-            exec: async ({param: param}) => {
-                console.warn(param);
-                //debugger;
-                let result = {mahl: "zeit"};
-                return result;
-            },
-            exit: process_model.swim_lane.marzipan.end.id
-        });
-        //bpep_agent.addNode(start);
-        end      = BPMN.End({
-            id:   process_model.swim_lane.marzipan.end.id,
-            exit: /** callback */(token) => { // REM : functions will NOT be replaced by 'renderTargets''...
-                console.warn(token);
-                //debugger;
-            }
-        });
+        //pool = BPMN.Pool({}),
+        //start    = BPMN.Start({
+        //    id:   process_model.swim_lane.marzipan.start.id,
+        //    exit: process_model.swim_lane.marzipan.mammahinne.id
+        //});
+        //activity = BPMN.Activity({
+        //    id:   process_model.swim_lane.marzipan.mammahinne.id,
+        //    exec: async ({param: param}) => {
+        //        console.warn(param);
+        //        //debugger;
+        //        let result = {mahl: "zeit"};
+        //        return result;
+        //    },
+        //    exit: process_model.swim_lane.marzipan.end.id
+        //});
+        ////bpep_agent.addNode(start);
+        //end      = BPMN.End({
+        //    id:   process_model.swim_lane.marzipan.end.id,
+        //    exit: /** callback */(token) => { // REM : functions will NOT be replaced by 'renderTargets''...
+        //        console.warn(token);
+        //        //debugger;
+        //    }
+        //});
         //bpep_agent.addNode(end);
     } catch (jex) {
         debugger;
