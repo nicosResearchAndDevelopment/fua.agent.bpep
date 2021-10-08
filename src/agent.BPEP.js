@@ -164,7 +164,7 @@ class BPEPAgent extends EventEmitter {
                     try {
                         let result = [];
                         _enforceable.forEach((value, key, map) => {
-                            console.log(`m[${key}] = ${value}`);
+                            //console.log(`m[${key}] = ${value}`);
                             if (value.exit) {
                                 for (const [exit_key, exit_value] of Object.entries(value.exit)) {
                                     if (typeof exit_value !== "function") {
@@ -173,6 +173,9 @@ class BPEPAgent extends EventEmitter {
 
                                         if (!target)
                                             throw(new Error(``)); // TODO : better Error
+                                        if(target.start) {
+                                            target = target.start;
+                                        }
                                         if (typeof target !== "function")
                                             throw(new Error(``)); // TODO : better Error
 
@@ -191,10 +194,7 @@ class BPEPAgent extends EventEmitter {
             }, // renderTargets
             enforce:       {
                 value:                                       (({enforceable: enforceable}) => {
-                    return async ({
-                                      id:    id = undefined,
-                                      token: token
-                                  }) => {
+                    return async (id, token, data) => {
                         //this.#event({
                         //    id:        `${this.#id}event/#${uuid.v1()}`,
                         //    prov:      `${this.#id}enforce`,
@@ -232,7 +232,7 @@ class BPEPAgent extends EventEmitter {
                                     prov:   `${this.#id}enforce/`
                                 });
 
-                            result = await target({token: token});
+                            result = await target(token, data);
 
                             if (error) {
                                 throw(error);
@@ -268,16 +268,6 @@ class BPEPAgent extends EventEmitter {
                     }; // return
                 })({enforceable: _enforceable}), enumerable: false
             } // enforce
-            ////
-            //addTargets:    {
-            //    value:         async (targets) => {
-            //        try {
-            //
-            //        } catch (jex) {
-            //        } // try
-            //    }, enumerable: false
-            //}, // addTargets
-
         }); // Object.defineProperties(BPEPAgent)
 
         //if (new.target === BPEPAgent)
