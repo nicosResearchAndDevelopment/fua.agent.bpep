@@ -1,6 +1,3 @@
-# agent.BPEP
+# @fua/agent.bpep
 
-fua agent "Business Process Enforcement Point"
-
----
----
+Business Process Enforcement Point
