@@ -2,8 +2,8 @@ const
     //path           = require('path'),
     {EventEmitter} = require('events'),
     //
-    util           = require('@nrd/fua.core.util'),
-    uuid           = require("@nrd/fua.core.uuid"),
+    util           = require('@fua/core.util'),
+    uuid           = require("@fua/core.uuid"),
     //
     prefix         = "bpep",
     error_kind     = "error",

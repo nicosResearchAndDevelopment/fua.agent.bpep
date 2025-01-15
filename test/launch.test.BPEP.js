@@ -1,7 +1,7 @@
 const
     path         = require('path'),
-    util         = require('@nrd/fua.core.util'),
-    uuid         = require("@nrd/fua.core.uuid"),
+    util         = require('@fua/core.util'),
+    uuid         = require("@fua/core.uuid"),
     //
     {BPEPAgent}  = require('../src/agent.BPEP'),
     BPMN_factory = require('../../module.BPMN-2.0/src/module.BPMN'),
